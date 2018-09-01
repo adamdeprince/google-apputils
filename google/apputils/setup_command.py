@@ -126,7 +126,7 @@ class GoogleTest(test.test):
     sys.argv = [module.__file__] + self.test_args
 
     # Late import since this must be run with the project's sys.path.
-    import basetest
+    from . import basetest
     try:
       try:
         sys.stderr.write('Testing %s\n' % module_name)

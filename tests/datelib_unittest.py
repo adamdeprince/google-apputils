@@ -38,12 +38,12 @@ class TimestampUnitTest(basetest.TestCase):
 
   def testTzRandomConversion(self):
     random.seed(self.seed)
-    for unused_i in xrange(100):
+    for unused_i in range(100):
       stz = pytz.timezone(random.choice(pytz.all_timezones))
       a = datelib.Timestamp.FromString('2008-04-12T10:00:00', stz)
 
       b = a
-      for unused_j in xrange(100):
+      for unused_j in range(100):
         b = b.astimezone(pytz.timezone(random.choice(pytz.all_timezones)))
         self.assertEqual(a, b)
     random.seed()
@@ -59,7 +59,7 @@ class TimestampUnitTest(basetest.TestCase):
     IsEq(datelib.MAXIMUM_MICROSECOND_TIMESTAMP)
 
     random.seed(self.seed)
-    for _ in xrange(100):
+    for _ in range(100):
       IsEq(random.randint(0, datelib.MAXIMUM_MICROSECOND_TIMESTAMP))
 
   def testMicroTimestampKnown(self):
@@ -80,7 +80,7 @@ class TimestampUnitTest(basetest.TestCase):
               datelib.Timestamp.FromMicroTimestamp(b)))
 
     random.seed(self.seed)
-    for unused_i in xrange(100):
+    for unused_i in range(100):
       IsEq(
           random.randint(0, datelib.MAXIMUM_MICROSECOND_TIMESTAMP),
           random.randint(0, datelib.MAXIMUM_MICROSECOND_TIMESTAMP))
@@ -131,7 +131,7 @@ class TimestampUnitTest(basetest.TestCase):
 
     startdate = datelib.US_PACIFIC.localize(
         datelib.Timestamp(2009, 1, 1, 3, 0, 0, 0))
-    for day in xrange(1, 366):
+    for day in range(1, 366):
       self.assertEqual(
           datelib.Timestamp.FromString(startdate.isoformat()),
           startdate,
@@ -144,7 +144,7 @@ class TimestampUnitTest(basetest.TestCase):
     The result shall always be the same as tz.localize(naive_time).
     """
     baseday = datelib.datetime.date(2009, 1, 1).toordinal()
-    for day_offset in xrange(0, 365):
+    for day_offset in range(0, 365):
       day = datelib.datetime.date.fromordinal(baseday + day_offset)
       naive_day = datelib.datetime.datetime.combine(
           day, datelib.datetime.time(0, 45, 9))
@@ -184,9 +184,9 @@ class DatetimeConversionUnitTest(basetest.TestCase):
     self.assertEqual(
         0, datelib.DatetimeToUTCMicros(_EpochToDatetime(0)))
     self.assertEqual(
-        1001 * long(datelib._MICROSECONDS_PER_SECOND),
+        1001 * int(datelib._MICROSECONDS_PER_SECOND),
         datelib.DatetimeToUTCMicros(_EpochToDatetime(1001)))
-    self.assertEqual(long(self.now * datelib._MICROSECONDS_PER_SECOND),
+    self.assertEqual(int(self.now * datelib._MICROSECONDS_PER_SECOND),
                      datelib.DatetimeToUTCMicros(_EpochToDatetime(self.now)))
 
     # tzinfo shouldn't change the result
@@ -197,8 +197,8 @@ class DatetimeConversionUnitTest(basetest.TestCase):
     self.assertEqual(
         0, datelib.DatetimeToUTCMillis(_EpochToDatetime(0)))
     self.assertEqual(
-        1001 * 1000L, datelib.DatetimeToUTCMillis(_EpochToDatetime(1001)))
-    self.assertEqual(long(self.now * 1000),
+        1001 * 1000, datelib.DatetimeToUTCMillis(_EpochToDatetime(1001)))
+    self.assertEqual(int(self.now * 1000),
                      datelib.DatetimeToUTCMillis(_EpochToDatetime(self.now)))
 
     # tzinfo shouldn't change the result
@@ -210,7 +210,7 @@ class DatetimeConversionUnitTest(basetest.TestCase):
     self.assertEqual(_EpochToDatetime(1.000001),
                      datelib.UTCMicrosToDatetime(1000001))
     self.assertEqual(_EpochToDatetime(self.now), datelib.UTCMicrosToDatetime(
-        long(self.now * datelib._MICROSECONDS_PER_SECOND)))
+        int(self.now * datelib._MICROSECONDS_PER_SECOND)))
 
     # Check timezone-aware comparisons
     self.assertEqual(_EpochToDatetime(0, self.pst),
@@ -225,7 +225,7 @@ class DatetimeConversionUnitTest(basetest.TestCase):
     dt = _EpochToDatetime(t)
     # truncate sub-milli time
     dt -= datelib.datetime.timedelta(microseconds=dt.microsecond % 1000)
-    self.assertEqual(dt, datelib.UTCMillisToDatetime(long(t * 1000)))
+    self.assertEqual(dt, datelib.UTCMillisToDatetime(int(t * 1000)))
 
     # Check timezone-aware comparisons
     self.assertEqual(_EpochToDatetime(0, self.pst),

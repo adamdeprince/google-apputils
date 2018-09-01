@@ -90,7 +90,7 @@ class HumanizeTest(basetest.TestCase):
                      humanize.DecimalPrefix(-0.004, 'm', min_scale=None))
     self.assertEqual('0 m', humanize.DecimalPrefix(0, 'm', min_scale=None))
     self.assertEqual(
-        u'1 µs',
+        '1 µs',
         humanize.DecimalPrefix(0.0000013, 's', min_scale=None))
     self.assertEqual('3 km', humanize.DecimalPrefix(3000, 'm', min_scale=None))
     self.assertEqual(
@@ -117,7 +117,7 @@ class HumanizeTest(basetest.TestCase):
     # Test both int and long versions of the same quantity to make sure they are
     # printed in the same way.
     self.assertEqual('10.0 QPS', humanize.BinaryPrefix(10, 'QPS', precision=3))
-    self.assertEqual('10.0 QPS', humanize.BinaryPrefix(10L, 'QPS', precision=3))
+    self.assertEqual('10.0 QPS', humanize.BinaryPrefix(10, 'QPS', precision=3))
 
   def testDecimalScale(self):
     self.assertIsInstance(humanize.DecimalScale(0, '')[0], float)
@@ -137,7 +137,7 @@ class HumanizeTest(basetest.TestCase):
     self.assertEqual((450, 'mSWE'),
                      humanize.DecimalScale(0.45, 'SWE', min_scale=None))
     self.assertEqual(
-        (250, u'µm'),
+        (250, 'µm'),
         humanize.DecimalScale(1.0 / (4 * 1000), 'm', min_scale=None))
     self.assertEqual(
         (0.250, 'km'),
@@ -159,31 +159,31 @@ class HumanizeTest(basetest.TestCase):
 
   def testPrettyFraction(self):
     # No rounded integer part
-    self.assertEqual(u'½', humanize.PrettyFraction(0.5))
+    self.assertEqual('½', humanize.PrettyFraction(0.5))
     # Roundeded integer + fraction
-    self.assertEqual(u'6⅔', humanize.PrettyFraction(20.0 / 3.0))
+    self.assertEqual('6⅔', humanize.PrettyFraction(20.0 / 3.0))
     # Rounded integer, no fraction
-    self.assertEqual(u'2', humanize.PrettyFraction(2.00001))
+    self.assertEqual('2', humanize.PrettyFraction(2.00001))
     # No rounded integer, no fraction
-    self.assertEqual(u'0', humanize.PrettyFraction(0.001))
+    self.assertEqual('0', humanize.PrettyFraction(0.001))
     # Round up
-    self.assertEqual(u'1', humanize.PrettyFraction(0.99))
+    self.assertEqual('1', humanize.PrettyFraction(0.99))
     # No round up, edge case
-    self.assertEqual(u'⅞', humanize.PrettyFraction(0.9))
+    self.assertEqual('⅞', humanize.PrettyFraction(0.9))
     # Negative fraction
-    self.assertEqual(u'-⅕', humanize.PrettyFraction(-0.2))
+    self.assertEqual('-⅕', humanize.PrettyFraction(-0.2))
     # Negative close to zero (should not be -0)
-    self.assertEqual(u'0', humanize.PrettyFraction(-0.001))
+    self.assertEqual('0', humanize.PrettyFraction(-0.001))
     # Smallest fraction that should round down.
-    self.assertEqual(u'0', humanize.PrettyFraction(1.0 / 16.0))
+    self.assertEqual('0', humanize.PrettyFraction(1.0 / 16.0))
     # Largest fraction should round up.
-    self.assertEqual(u'1', humanize.PrettyFraction(15.0 / 16.0))
+    self.assertEqual('1', humanize.PrettyFraction(15.0 / 16.0))
     # Integer zero.
-    self.assertEqual(u'0', humanize.PrettyFraction(0))
+    self.assertEqual('0', humanize.PrettyFraction(0))
     # Check that division yields fraction
-    self.assertEqual(u'⅘', humanize.PrettyFraction(4.0 / 5.0))
+    self.assertEqual('⅘', humanize.PrettyFraction(4.0 / 5.0))
     # Custom spacer.
-    self.assertEqual(u'2 ½', humanize.PrettyFraction(2.5, spacer=' '))
+    self.assertEqual('2 ½', humanize.PrettyFraction(2.5, spacer=' '))
 
   def testDuration(self):
     self.assertEqual('2h', humanize.Duration(7200))

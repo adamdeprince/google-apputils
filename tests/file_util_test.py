@@ -17,7 +17,7 @@
 
 
 
-import __builtin__
+import builtins
 import errno
 import os
 import posix
@@ -65,7 +65,7 @@ class FileUtilTempdirTest(basetest.TestCase):
     file_util.Write(self.file_path, 'original contents')
     file_util.Write(self.file_path, self.sample_contents)
     with open(self.file_path) as fp:
-      self.assertEquals(fp.read(), self.sample_contents)
+      self.assertEqual(fp.read(), self.sample_contents)
 
   def testWriteExclusive(self):
     file_util.Write(self.file_path, 'original contents')
@@ -73,7 +73,7 @@ class FileUtilTempdirTest(basetest.TestCase):
                       self.sample_contents, overwrite_existing=False)
 
   def testWriteMode(self):
-    mode = 0744
+    mode = 0o744
     file_util.Write(self.file_path, self.sample_contents, mode=mode)
     s = os.stat(self.file_path)
     self.assertEqual(stat.S_IMODE(s.st_mode), mode)
@@ -81,10 +81,10 @@ class FileUtilTempdirTest(basetest.TestCase):
   def testAtomicWriteSuccessful(self):
     file_util.AtomicWrite(self.file_path, self.sample_contents)
     with open(self.file_path) as fp:
-      self.assertEquals(fp.read(), self.sample_contents)
+      self.assertEqual(fp.read(), self.sample_contents)
 
   def testAtomicWriteMode(self):
-    mode = 0745
+    mode = 0o745
     file_util.AtomicWrite(self.file_path, self.sample_contents, mode=mode)
     s = os.stat(self.file_path)
     self.assertEqual(stat.S_IMODE(s.st_mode), mode)
@@ -126,7 +126,7 @@ class FileUtilMoxTest(FileUtilMoxTestBase):
 
     self.mox.ReplayAll()
     try:
-      self.assertEquals(file_util.Read(self.file_path), self.sample_contents)
+      self.assertEqual(file_util.Read(self.file_path), self.sample_contents)
       self.mox.VerifyAll()
     finally:
       # Because we mock out the built-in open() function, which the unittest
@@ -143,7 +143,7 @@ class FileUtilMoxTest(FileUtilMoxTestBase):
     self.mox.StubOutWithMock(os, 'chown')
     gid = 'new gid'
     os.open(self.file_path, os.O_WRONLY | os.O_TRUNC | os.O_CREAT,
-            0666).AndReturn(self.fd)
+            0o666).AndReturn(self.fd)
     os.write(self.fd, self.sample_contents)
     os.close(self.fd)
     os.chown(self.file_path, -1, gid)
@@ -212,7 +212,7 @@ class AtomicWriteMoxTest(FileUtilMoxTestBase):
       file_util.AtomicWrite(self.file_path, self.sample_contents,
                             mode=self.mode)
     except OSError as e:
-      self.assertEquals(str(e),
+      self.assertEqual(str(e),
                         'A problem renaming!. Additional errors cleaning up: '
                         'A problem removing!')
     else:
@@ -245,7 +245,7 @@ class TemporaryDirsMoxTest(FileUtilMoxTestBase):
     temp_dirs = []
     self.assertRaises(Exception, Inner, temp_dirs)
     # Ensure that the directory is removed on exit even when exceptions happen.
-    self.assertEquals(len(temp_dirs), 1)
+    self.assertEqual(len(temp_dirs), 1)
     self.assertFalse(os.path.isdir(temp_dirs[0]))
 
   def testTemporaryDirectory(self):
@@ -282,10 +282,10 @@ class MkDirsMoxTest(FileUtilMoxTestBase):
   def testNoErrorsAbsoluteOneDirWithForceMode(self):
     # record, replay
     os.mkdir('/foo')
-    os.chmod('/foo', 0707)
+    os.chmod('/foo', 0o707)
     self.mox.ReplayAll()
     # test, verify
-    file_util.MkDirs('/foo', force_mode=0707)
+    file_util.MkDirs('/foo', force_mode=0o707)
     self.mox.VerifyAll()
 
   def testNoErrorsExistingDirWithForceMode(self):
@@ -296,7 +296,7 @@ class MkDirsMoxTest(FileUtilMoxTestBase):
     os.path.isdir('/foo').AndReturn(True)
     self.mox.ReplayAll()
     # test, verify
-    file_util.MkDirs('/foo', force_mode=0707)
+    file_util.MkDirs('/foo', force_mode=0o707)
     self.mox.VerifyAll()
 
   def testNoErrorsAbsoluteSlashDot(self):
@@ -332,10 +332,10 @@ class MkDirsMoxTest(FileUtilMoxTestBase):
     os.mkdir('/foo').AndRaise(exist_error)  # /foo exists
     os.path.isdir('/foo').AndReturn(True)
     os.mkdir('/foo/bar')  # bar does not
-    os.chmod('/foo/bar', 0707)
+    os.chmod('/foo/bar', 0o707)
     self.mox.ReplayAll()
     # test, verify
-    file_util.MkDirs('/foo/bar', force_mode=0707)
+    file_util.MkDirs('/foo/bar', force_mode=0o707)
     self.mox.VerifyAll()
 
   def testNoErrorsRelativeOneDir(self):

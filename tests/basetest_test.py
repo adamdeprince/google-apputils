@@ -181,8 +181,8 @@ class GoogleTestBaseUnitTest(basetest.TestCase):
   def testFlags(self):
     if FLAGS.testid == 1:
       self.assertEqual(FLAGS.test_random_seed, 301)
-      self.assert_(FLAGS.test_tmpdir.startswith('/'))
-      self.assert_(os.access(FLAGS.test_tmpdir, os.W_OK))
+      self.assertTrue(FLAGS.test_tmpdir.startswith('/'))
+      self.assertTrue(os.access(FLAGS.test_tmpdir, os.W_OK))
     elif FLAGS.testid == 2:
       self.assertEqual(FLAGS.test_random_seed, 321)
       self.assertEqual(FLAGS.test_srcdir, 'cba')
@@ -311,14 +311,14 @@ class GoogleTestBaseUnitTest(basetest.TestCase):
       # Ensure we use equality as the sole measure of elements, not type, since
       # that is consistent with dict equality.
       self.assertDictEqual({1: 1.0, 2: 2}, {1: 1, 2: 3})
-    except AssertionError, e:
+    except AssertionError as e:
       self.assertMultiLineEqual('{1: 1.0, 2: 2} != {1: 1, 2: 3}\n'
                                 'repr() of differing entries:\n2: 2 != 3\n',
                                 str(e))
 
     try:
       self.assertDictEqual({}, {'x': 1})
-    except AssertionError, e:
+    except AssertionError as e:
       self.assertMultiLineEqual("{} != {'x': 1}\n"
                                 "Unexpected, but present entries:\n'x': 1\n",
                                 str(e))
@@ -327,7 +327,7 @@ class GoogleTestBaseUnitTest(basetest.TestCase):
 
     try:
       self.assertDictEqual({}, {'x': 1}, 'a message')
-    except AssertionError, e:
+    except AssertionError as e:
       self.assertIn('a message', str(e))
     else:
       self.fail('Expecting AssertionError')
@@ -336,7 +336,7 @@ class GoogleTestBaseUnitTest(basetest.TestCase):
     seen = {'a': 2, 'c': 3, 'd': 4}
     try:
       self.assertDictEqual(expected, seen)
-    except AssertionError, e:
+    except AssertionError as e:
       self.assertMultiLineEqual("""\
 {'a': 1, 'b': 2, 'c': 3} != {'a': 2, 'c': 3, 'd': 4}
 Unexpected, but present entries:
@@ -369,19 +369,19 @@ Missing entries:
       self.assertDictEqual(
           {'a': Obj('A'), Obj('b'): Obj('B'), Obj('c'): Obj('C')},
           {'a': Obj('A'), Obj('d'): Obj('D'), Obj('e'): Obj('E')})
-    except AssertionError, e:
+    except AssertionError as e:
       # Do as best we can not to be misleading when objects have the same repr
       # but aren't equal.
       err_str = str(e)
       self.assertStartsWith(err_str,
                             "{'a': A, b: B, c: C} != {'a': A, d: D, e: E}\n")
-      self.assertRegexpMatches(err_str,
+      self.assertRegex(err_str,
                                r'(?ms).*^Unexpected, but present entries:\s+'
                                r'^(d: D$\s+^e: E|e: E$\s+^d: D)$')
-      self.assertRegexpMatches(err_str,
+      self.assertRegex(err_str,
                                r'(?ms).*^repr\(\) of differing entries:\s+'
                                r'^.a.: A != A$', err_str)
-      self.assertRegexpMatches(err_str,
+      self.assertRegex(err_str,
                                r'(?ms).*^Missing entries:\s+'
                                r'^(b: B$\s+^c: C|c: C$\s+^b: B)$')
     else:
@@ -404,7 +404,7 @@ Missing entries:
       # prefix or a basetest_test prefix, so strip that for comparison.
       error_msg = re.sub(
           r'( at 0x[^>]+)|__main__\.|basetest_test\.', '', str(e))
-      self.assertRegexpMatches(error_msg, """(?m)\
+      self.assertRegex(error_msg, """(?m)\
 {<.*RaisesOnRepr object.*>: <.*RaisesOnRepr object.*>} != \
 {<.*RaisesOnRepr object.*>: <.*RaisesOnRepr object.*>}
 Unexpected, but present entries:
@@ -548,14 +548,14 @@ Missing entries:
     self.assertNotAlmostEqual(1.0000001, 1.0)
 
   def testAssertAlmostEqualsWithDelta(self):
-    self.assertAlmostEquals(3.14, 3, delta=0.2)
-    self.assertAlmostEquals(2.81, 3.14, delta=1)
-    self.assertAlmostEquals(-1, 1, delta=3)
-    self.assertRaises(AssertionError, self.assertAlmostEquals,
+    self.assertAlmostEqual(3.14, 3, delta=0.2)
+    self.assertAlmostEqual(2.81, 3.14, delta=1)
+    self.assertAlmostEqual(-1, 1, delta=3)
+    self.assertRaises(AssertionError, self.assertAlmostEqual,
                       3.14, 2.81, delta=0.1)
-    self.assertRaises(AssertionError, self.assertAlmostEquals,
+    self.assertRaises(AssertionError, self.assertAlmostEqual,
                       1, 2, delta=0.5)
-    self.assertNotAlmostEquals(3.14, 2.81, delta=0.1)
+    self.assertNotAlmostEqual(3.14, 2.81, delta=0.1)
 
   def testGetCommandString_listOfStringArgument(self):
     expected = "'command' 'arg-0'"
@@ -567,7 +567,7 @@ Missing entries:
   def testGetCommandString_listOfUnicodeStringArgument(self):
     expected = "'command' 'arg-0'"
 
-    observed = basetest.GetCommandString([u'command', u'arg-0'])
+    observed = basetest.GetCommandString(['command', 'arg-0'])
 
     self.assertEqual(expected, observed)
 
@@ -581,7 +581,7 @@ Missing entries:
   def testGetCommandString_unicodeStringArgument(self):
     expected = 'command arg-0'
 
-    observed = basetest.GetCommandString(u'command arg-0')
+    observed = basetest.GetCommandString('command arg-0')
 
     self.assertEqual(expected, observed)
 
@@ -638,11 +638,11 @@ Missing entries:
 
   def testAssertRegexMatch_unicodeVsBytes(self):
     """Ensure proper utf-8 encoding or decoding happens automatically."""
-    self.assertRegexMatch(u'str', [b'str'])
-    self.assertRegexMatch(b'str', [u'str'])
+    self.assertRegexMatch('str', [b'str'])
+    self.assertRegexMatch(b'str', ['str'])
 
   def testAssertRegexMatch_unicode(self):
-    self.assertRegexMatch(u'foo str', [u'str'])
+    self.assertRegexMatch('foo str', ['str'])
 
   def testAssertRegexMatch_bytes(self):
     self.assertRegexMatch(b'foo str', [b'str'])
@@ -650,7 +650,7 @@ Missing entries:
   def testAssertRegexMatch_allTheSameType(self):
     self.assertRaisesWithRegexpMatch(
         AssertionError, 'regexes .* same type',
-        self.assertRegexMatch, 'foo str', [b'str', u'foo'])
+        self.assertRegexMatch, 'foo str', [b'str', 'foo'])
 
   def testAssertCommandFailsStderr(self):
     # TODO(user): Gross!  These should use sys.executable instead of
@@ -663,13 +663,13 @@ Missing entries:
     self.assertCommandFails(['false'], [''])
 
   def testAssertCommandFailsWithListOfUnicodeString(self):
-    self.assertCommandFails([u'false'], [''])
+    self.assertCommandFails(['false'], [''])
 
   def testAssertCommandFailsWithUnicodeString(self):
-    self.assertCommandFails(u'false', [u''])
+    self.assertCommandFails('false', [''])
 
   def testAssertCommandFailsWithUnicodeStringBytesRegex(self):
-    self.assertCommandFails(u'false', [b''])
+    self.assertCommandFails('false', [b''])
 
   def testAssertCommandSucceedsStderr(self):
     expected_re = re.compile(r'(.|\n)*FAIL at -e line 1\.', re.MULTILINE)
@@ -681,7 +681,7 @@ Missing entries:
         ['/usr/bin/perl', '-e', 'die "FAIL";'])
 
   def testAssertCommandSucceedsWithMatchingUnicodeRegexes(self):
-    self.assertCommandSucceeds(['echo', 'SUCCESS'], regexes=[u'SUCCESS'])
+    self.assertCommandSucceeds(['echo', 'SUCCESS'], regexes=['SUCCESS'])
 
   def testAssertCommandSucceedsWithMatchingBytesRegexes(self):
     self.assertCommandSucceeds(['echo', 'SUCCESS'], regexes=[b'SUCCESS'])
@@ -700,10 +700,10 @@ Missing entries:
     self.assertCommandSucceeds(['true'])
 
   def testAssertCommandSucceedsWithListOfUnicodeString(self):
-    self.assertCommandSucceeds([u'true'])
+    self.assertCommandSucceeds(['true'])
 
   def testAssertCommandSucceedsWithUnicodeString(self):
-    self.assertCommandSucceeds(u'true')
+    self.assertCommandSucceeds('true')
 
   def testInequality(self):
     # Try ints
@@ -749,44 +749,44 @@ Missing entries:
     self.assertRaises(AssertionError, self.assertLessEqual, 'bug', 'ant')
 
     # Try Unicode
-    self.assertGreater(u'bug', u'ant')
-    self.assertGreaterEqual(u'bug', u'ant')
-    self.assertGreaterEqual(u'ant', u'ant')
-    self.assertLess(u'ant', u'bug')
-    self.assertLessEqual(u'ant', u'bug')
-    self.assertLessEqual(u'ant', u'ant')
-    self.assertRaises(AssertionError, self.assertGreater, u'ant', u'bug')
-    self.assertRaises(AssertionError, self.assertGreater, u'ant', u'ant')
-    self.assertRaises(AssertionError, self.assertGreaterEqual, u'ant', u'bug')
-    self.assertRaises(AssertionError, self.assertLess, u'bug', u'ant')
-    self.assertRaises(AssertionError, self.assertLess, u'ant', u'ant')
-    self.assertRaises(AssertionError, self.assertLessEqual, u'bug', u'ant')
+    self.assertGreater('bug', 'ant')
+    self.assertGreaterEqual('bug', 'ant')
+    self.assertGreaterEqual('ant', 'ant')
+    self.assertLess('ant', 'bug')
+    self.assertLessEqual('ant', 'bug')
+    self.assertLessEqual('ant', 'ant')
+    self.assertRaises(AssertionError, self.assertGreater, 'ant', 'bug')
+    self.assertRaises(AssertionError, self.assertGreater, 'ant', 'ant')
+    self.assertRaises(AssertionError, self.assertGreaterEqual, 'ant', 'bug')
+    self.assertRaises(AssertionError, self.assertLess, 'bug', 'ant')
+    self.assertRaises(AssertionError, self.assertLess, 'ant', 'ant')
+    self.assertRaises(AssertionError, self.assertLessEqual, 'bug', 'ant')
 
     # Try Mixed String/Unicode
-    self.assertGreater('bug', u'ant')
-    self.assertGreater(u'bug', 'ant')
-    self.assertGreaterEqual('bug', u'ant')
-    self.assertGreaterEqual(u'bug', 'ant')
-    self.assertGreaterEqual('ant', u'ant')
-    self.assertGreaterEqual(u'ant', 'ant')
-    self.assertLess('ant', u'bug')
-    self.assertLess(u'ant', 'bug')
-    self.assertLessEqual('ant', u'bug')
-    self.assertLessEqual(u'ant', 'bug')
-    self.assertLessEqual('ant', u'ant')
-    self.assertLessEqual(u'ant', 'ant')
-    self.assertRaises(AssertionError, self.assertGreater, 'ant', u'bug')
-    self.assertRaises(AssertionError, self.assertGreater, u'ant', 'bug')
-    self.assertRaises(AssertionError, self.assertGreater, 'ant', u'ant')
-    self.assertRaises(AssertionError, self.assertGreater, u'ant', 'ant')
-    self.assertRaises(AssertionError, self.assertGreaterEqual, 'ant', u'bug')
-    self.assertRaises(AssertionError, self.assertGreaterEqual, u'ant', 'bug')
-    self.assertRaises(AssertionError, self.assertLess, 'bug', u'ant')
-    self.assertRaises(AssertionError, self.assertLess, u'bug', 'ant')
-    self.assertRaises(AssertionError, self.assertLess, 'ant', u'ant')
-    self.assertRaises(AssertionError, self.assertLess, u'ant', 'ant')
-    self.assertRaises(AssertionError, self.assertLessEqual, 'bug', u'ant')
-    self.assertRaises(AssertionError, self.assertLessEqual, u'bug', 'ant')
+    self.assertGreater('bug', 'ant')
+    self.assertGreater('bug', 'ant')
+    self.assertGreaterEqual('bug', 'ant')
+    self.assertGreaterEqual('bug', 'ant')
+    self.assertGreaterEqual('ant', 'ant')
+    self.assertGreaterEqual('ant', 'ant')
+    self.assertLess('ant', 'bug')
+    self.assertLess('ant', 'bug')
+    self.assertLessEqual('ant', 'bug')
+    self.assertLessEqual('ant', 'bug')
+    self.assertLessEqual('ant', 'ant')
+    self.assertLessEqual('ant', 'ant')
+    self.assertRaises(AssertionError, self.assertGreater, 'ant', 'bug')
+    self.assertRaises(AssertionError, self.assertGreater, 'ant', 'bug')
+    self.assertRaises(AssertionError, self.assertGreater, 'ant', 'ant')
+    self.assertRaises(AssertionError, self.assertGreater, 'ant', 'ant')
+    self.assertRaises(AssertionError, self.assertGreaterEqual, 'ant', 'bug')
+    self.assertRaises(AssertionError, self.assertGreaterEqual, 'ant', 'bug')
+    self.assertRaises(AssertionError, self.assertLess, 'bug', 'ant')
+    self.assertRaises(AssertionError, self.assertLess, 'bug', 'ant')
+    self.assertRaises(AssertionError, self.assertLess, 'ant', 'ant')
+    self.assertRaises(AssertionError, self.assertLess, 'ant', 'ant')
+    self.assertRaises(AssertionError, self.assertLessEqual, 'bug', 'ant')
+    self.assertRaises(AssertionError, self.assertLessEqual, 'bug', 'ant')
 
   def testAssertMultiLineEqual(self):
     sample_text = """\
@@ -812,8 +812,8 @@ test case
 +     own implementation that does not subclass from TestCase, of course.
 """
 
-    for type1 in (str, unicode):
-      for type2 in (str, unicode):
+    for type1 in (str, str):
+      for type2 in (str, str):
         self.assertRaisesWithLiteralMatch(AssertionError, sample_text_error,
                                           self.assertMultiLineEqual,
                                           type1(sample_text),
@@ -887,12 +887,12 @@ test case
     self.assertRaises(AssertionError, self.assertBetween, -1e10000, -1e10, 0)
 
   def testAssertRaisesWithPredicateMatch_noRaiseFails(self):
-    with self.assertRaisesRegexp(AssertionError, '^Exception not raised$'):
+    with self.assertRaisesRegex(AssertionError, '^Exception not raised$'):
       self.assertRaisesWithPredicateMatch(Exception,
                                           lambda e: True,
                                           lambda: 1)  # don't raise
 
-    with self.assertRaisesRegexp(AssertionError, '^Exception not raised$'):
+    with self.assertRaisesRegex(AssertionError, '^Exception not raised$'):
       with self.assertRaisesWithPredicateMatch(Exception, lambda e: True):
         pass  # don't raise
 
@@ -912,12 +912,12 @@ test case
   def testAssertRaisesWithPredicateMatch_predicateFails(self):
     def _RaiseValueError():
       raise ValueError
-    with self.assertRaisesRegexp(AssertionError, ' does not match predicate '):
+    with self.assertRaisesRegex(AssertionError, ' does not match predicate '):
       self.assertRaisesWithPredicateMatch(ValueError,
                                           lambda e: False,
                                           _RaiseValueError)
 
-    with self.assertRaisesRegexp(AssertionError, ' does not match predicate '):
+    with self.assertRaisesRegex(AssertionError, ' does not match predicate '):
       with self.assertRaisesWithPredicateMatch(ValueError, lambda e: False):
         raise ValueError
 
@@ -941,7 +941,7 @@ test case
 
     self.assertRaisesWithRegexpMatch(ExceptionMock, re.compile('expect$'), Stub)
     self.assertRaisesWithRegexpMatch(ExceptionMock, 'expect$', Stub)
-    self.assertRaisesWithRegexpMatch(ExceptionMock, u'expect$', Stub)
+    self.assertRaisesWithRegexpMatch(ExceptionMock, 'expect$', Stub)
 
   def testAssertNotRaisesWithRegexpMatch(self):
     self.assertRaisesWithRegexpMatch(
@@ -953,7 +953,7 @@ test case
         self.assertRaisesWithRegexpMatch, Exception, 'x', lambda: None)
     self.assertRaisesWithRegexpMatch(
         AssertionError, '^Exception not raised',
-        self.assertRaisesWithRegexpMatch, Exception, u'x', lambda: None)
+        self.assertRaisesWithRegexpMatch, Exception, 'x', lambda: None)
 
   def testAssertRaisesWithRegexpMismatch(self):
     def Stub():
@@ -1106,14 +1106,14 @@ test case
     self.assertRaises(AssertionError, self.assertTotallyOrdered, [1, 2])
 
   def testShortDescriptionWithoutDocstring(self):
-    self.assertEquals(
+    self.assertEqual(
         self.shortDescription(),
         ('testShortDescriptionWithoutDocstring '
          '(%s.GoogleTestBaseUnitTest)' % __name__))
 
   def testShortDescriptionWithOneLineDocstring(self):
     """Tests shortDescription() for a method with a docstring."""
-    self.assertEquals(
+    self.assertEqual(
         self.shortDescription(),
         ('testShortDescriptionWithOneLineDocstring '
          '(%s.GoogleTestBaseUnitTest)\n'
@@ -1126,7 +1126,7 @@ test case
     returned used in the short description, no matter how long the
     whole thing is.
     """
-    self.assertEquals(
+    self.assertEqual(
         self.shortDescription(),
         ('testShortDescriptionWithMultiLineDocstring '
          '(%s.GoogleTestBaseUnitTest)\n'
@@ -1136,7 +1136,7 @@ test case
   def testRecordedProperties(self):
     """Tests that a test can record a property and then retrieve it."""
     self.recordProperty('test_property', 'test_value')
-    self.assertEquals(self.getRecordedProperties(),
+    self.assertEqual(self.getRecordedProperties(),
                       {'test_property': 'test_value'})
 
   def testAssertUrlEqualSame(self):
@@ -1185,7 +1185,7 @@ test case
     self.assertSameStructure({}, {})
     self.assertSameStructure({'one': 1}, {'one': 1})
     # int and long should always be treated as the same type.
-    self.assertSameStructure({3L: 3}, {3: 3L})
+    self.assertSameStructure({3: 3}, {3: 3})
 
   def testSameStructure_different(self):
     # Different type
@@ -1405,22 +1405,22 @@ class EqualityAssertionTest(basetest.TestCase):
     # Compare two distinct objects
     self.assertFalse(i1 is i2)
     self.assertRaises(AssertionError, self.assertEqual, i1, i2)
-    self.assertRaises(AssertionError, self.assertEquals, i1, i2)
-    self.assertRaises(AssertionError, self.failUnlessEqual, i1, i2)
+    self.assertRaises(AssertionError, self.assertEqual, i1, i2)
+    self.assertRaises(AssertionError, self.assertEqual, i1, i2)
     self.assertRaises(AssertionError, self.assertNotEqual, i1, i2)
-    self.assertRaises(AssertionError, self.assertNotEquals, i1, i2)
-    self.assertRaises(AssertionError, self.failIfEqual, i1, i2)
+    self.assertRaises(AssertionError, self.assertNotEqual, i1, i2)
+    self.assertRaises(AssertionError, self.assertNotEqual, i1, i2)
     # A NeverEqual object should not compare equal to itself either.
     i2 = i1
     self.assertTrue(i1 is i2)
     self.assertFalse(i1 == i2)
     self.assertFalse(i1 != i2)
     self.assertRaises(AssertionError, self.assertEqual, i1, i2)
-    self.assertRaises(AssertionError, self.assertEquals, i1, i2)
-    self.assertRaises(AssertionError, self.failUnlessEqual, i1, i2)
+    self.assertRaises(AssertionError, self.assertEqual, i1, i2)
+    self.assertRaises(AssertionError, self.assertEqual, i1, i2)
     self.assertRaises(AssertionError, self.assertNotEqual, i1, i2)
-    self.assertRaises(AssertionError, self.assertNotEquals, i1, i2)
-    self.assertRaises(AssertionError, self.failIfEqual, i1, i2)
+    self.assertRaises(AssertionError, self.assertNotEqual, i1, i2)
+    self.assertRaises(AssertionError, self.assertNotEqual, i1, i2)
 
   def testAllComparisonsSucceed(self):
     a = self.AllSame()
@@ -1429,11 +1429,11 @@ class EqualityAssertionTest(basetest.TestCase):
     self.assertTrue(a == b)
     self.assertFalse(a != b)
     self.assertEqual(a, b)
-    self.assertEquals(a, b)
-    self.failUnlessEqual(a, b)
+    self.assertEqual(a, b)
+    self.assertEqual(a, b)
     self.assertRaises(AssertionError, self.assertNotEqual, a, b)
-    self.assertRaises(AssertionError, self.assertNotEquals, a, b)
-    self.assertRaises(AssertionError, self.failIfEqual, a, b)
+    self.assertRaises(AssertionError, self.assertNotEqual, a, b)
+    self.assertRaises(AssertionError, self.assertNotEqual, a, b)
 
   def _PerformAppleAppleOrangeChecks(self, same_a, same_b, different):
     """Perform consistency checks with two apples and an orange.
@@ -1450,8 +1450,8 @@ class EqualityAssertionTest(basetest.TestCase):
     self.assertTrue(same_a == same_b)
     self.assertFalse(same_a != same_b)
     self.assertEqual(same_a, same_b)
-    self.assertEquals(same_a, same_b)
-    self.failUnlessEqual(same_a, same_b)
+    self.assertEqual(same_a, same_b)
+    self.assertEqual(same_a, same_b)
     if PY_VERSION_2:
       # Python 3 removes the global cmp function
       self.assertEqual(0, cmp(same_a, same_b))
@@ -1459,16 +1459,16 @@ class EqualityAssertionTest(basetest.TestCase):
     self.assertFalse(same_a == different)
     self.assertTrue(same_a != different)
     self.assertNotEqual(same_a, different)
-    self.assertNotEquals(same_a, different)
-    self.failIfEqual(same_a, different)
+    self.assertNotEqual(same_a, different)
+    self.assertNotEqual(same_a, different)
     if PY_VERSION_2:
       self.assertNotEqual(0, cmp(same_a, different))
 
     self.assertFalse(same_b == different)
     self.assertTrue(same_b != different)
     self.assertNotEqual(same_b, different)
-    self.assertNotEquals(same_b, different)
-    self.failIfEqual(same_b, different)
+    self.assertNotEqual(same_b, different)
+    self.assertNotEqual(same_b, different)
     if PY_VERSION_2:
       self.assertNotEqual(0, cmp(same_b, different))
 
@@ -1566,7 +1566,7 @@ class InitNotNecessaryForAssertsTest(basetest.TestCase):
       def __init__(self):  # pylint: disable=super-init-not-called
         pass
 
-    Subclass().assertEquals({}, {})
+    Subclass().assertEqual({}, {})
 
   def testMultipleInheritance(self):
 
@@ -1578,7 +1578,7 @@ class InitNotNecessaryForAssertsTest(basetest.TestCase):
     class Subclass(Foo, basetest.TestCase):
       pass
 
-    Subclass().assertEquals({}, {})
+    Subclass().assertEqual({}, {})
 
 
 if __name__ == '__main__':

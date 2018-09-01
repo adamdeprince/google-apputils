@@ -53,13 +53,13 @@ class Test1(appcommands.Cmd):
     Returns:
       Value of flag fail1
     """
-    print 'Command1'
+    print('Command1')
     if FLAGS.hint:
-      print "Hint1:'%s'" % FLAGS.hint
-    print "Foo1:'%s'" % FLAGS.foo
-    print "Bar1:'%s'" % FLAGS.bar
+      print("Hint1:'%s'" % FLAGS.hint)
+    print("Foo1:'%s'" % FLAGS.foo)
+    print("Bar1:'%s'" % FLAGS.bar)
     if FLAGS.allhelp:
-      print "AllHelp:'%s'" % self._all_commands_help
+      print("AllHelp:'%s'" % self._all_commands_help)
     return FLAGS.fail1 * 1
 
 
@@ -83,22 +83,22 @@ class Test2(appcommands.Cmd):
     Returns:
       Value of flag fail2
     """
-    print 'Command2'
+    print('Command2')
     if FLAGS.hint:
-      print "Hint2:'%s'" % FLAGS.hint
-    print "Foo2:'%s'" % FLAGS.foo
-    print "Bar2:'%s'" % FLAGS.bar
+      print("Hint2:'%s'" % FLAGS.hint)
+    print("Foo2:'%s'" % FLAGS.foo)
+    print("Bar2:'%s'" % FLAGS.bar)
     return FLAGS.fail2 * 1
 
 
 def Test3(unused_argv):
   """Help for test3."""
-  print 'Command3'
+  print('Command3')
 
 
 def Test4(unused_argv):
   """Help for test4."""
-  print 'Command4'
+  print('Command4')
 
 
 def main(unused_argv):

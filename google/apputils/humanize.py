@@ -262,7 +262,7 @@ def _Prefix(quantity, unit, precision, scale_callable, **args):
 
 
 # Prefixes and corresponding min_scale and max_scale for decimal formating.
-DECIMAL_PREFIXES = ('y', 'z', 'a', 'f', 'p', 'n', u'µ', 'm',
+DECIMAL_PREFIXES = ('y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm',
                     '', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
 DECIMAL_MIN_SCALE = -8
 DECIMAL_MAX_SCALE = 8
@@ -343,9 +343,9 @@ def _Scale(quantity, unit, multiplier, prefixes=None, min_scale=None):
 # Contains the fractions where the full range [1/n ... (n - 1) / n]
 # is defined in Unicode.
 FRACTIONS = {
-    3: (None, u'⅓', u'⅔', None),
-    5: (None, u'⅕', u'⅖', u'⅗', u'⅘', None),
-    8: (None, u'⅛', u'¼', u'⅜', u'½', u'⅝', u'¾', u'⅞', None),
+    3: (None, '⅓', '⅔', None),
+    5: (None, '⅕', '⅖', '⅗', '⅘', None),
+    8: (None, '⅛', '¼', '⅜', '½', '⅝', '¾', '⅞', None),
 }
 
 FRACTION_ROUND_DOWN = 1.0 / (max(FRACTIONS.keys()) * 2.0)
@@ -370,25 +370,25 @@ def PrettyFraction(number, spacer=''):
   """
   # We do not want small negative numbers to display as -0.
   if number < -FRACTION_ROUND_DOWN:
-    return u'-%s' % PrettyFraction(-number)
+    return '-%s' % PrettyFraction(-number)
   number = abs(number)
   rounded = int(number)
   fract = number - rounded
   if fract >= FRACTION_ROUND_UP:
     return str(rounded + 1)
   errors_fractions = []
-  for denominator, fraction_elements in FRACTIONS.items():
+  for denominator, fraction_elements in list(FRACTIONS.items()):
     numerator = int(round(denominator * fract))
     error = abs(fract - (float(numerator) / float(denominator)))
     errors_fractions.append((error, fraction_elements[numerator]))
   unused_error, fraction_text = min(errors_fractions)
   if rounded and fraction_text:
-    return u'%d%s%s' % (rounded, spacer, fraction_text)
+    return '%d%s%s' % (rounded, spacer, fraction_text)
   if rounded:
     return str(rounded)
   if fraction_text:
     return fraction_text
-  return u'0'
+  return '0'
 
 
 def Duration(duration, separator=' '):
